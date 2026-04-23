@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import css from './notfoundpage.module.css';
+import css from './NotFoundPage.module.css';
 
 const NotFoundPage = () => (
   <div className={css.container}>

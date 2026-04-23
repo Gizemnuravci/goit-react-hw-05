@@ -1,19 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getMovieReviews } from '../../services/api';
-import css from './moviereviews.module.css';
+import css from './MovieReviews.module.css';
 
 const MovieReviews = () => {
   const { movieId } = useParams();
-  const [reviews, setReviews] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getMovieReviews(movieId)
-      .then(setReviews)
-      .catch(err => console.log(err))
+    const fetchMovieReviews = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getMovieReviews(movieId);
+        setReviews(data);
+      } catch {
+        setError('failed to load reviews.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovieReviews();
   }, [movieId]);
 
-  if (reviews === null) return <p>loading reviews...</p>;
+  if (isLoading) return <p>loading reviews...</p>;
+
+  if (error) return <p>{error}</p>;
 
   if (reviews.length === 0) {
     return <p>we don't have any reviews for this movie.</p>;

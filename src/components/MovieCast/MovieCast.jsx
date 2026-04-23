@@ -1,19 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getMovieCast } from '../../services/api';
-import css from './moviecast.module.css';
+import css from './MovieCast.module.css';
 
 const MovieCast = () => {
   const { movieId } = useParams();
-  const [cast, setCast] = useState(null);
+  const [cast, setCast] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getMovieCast(movieId)
-      .then(setCast)
-      .catch(err => console.log(err))
+    const fetchMovieCast = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getMovieCast(movieId);
+        setCast(data);
+      } catch {
+        setError('failed to load cast information.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovieCast();
   }, [movieId]);
 
-  if (cast === null) return <p>loading cast...</p>;
+  if (isLoading) return <p>loading cast...</p>;
+
+  if (error) return <p>{error}</p>;
 
   if (cast.length === 0) {
     return <p>we don't have any cast information for this movie.</p>;
